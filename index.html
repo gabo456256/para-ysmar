@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Para Ysmar ✨</title>
+    <!-- Fuente elegante -->
+    <link href="https://fonts.googleapis.com" rel="stylesheet">
+    <style>
+        body { margin: 0; background: #000; color: white; font-family: 'Quicksand', sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; text-align: center; }
+        #escena { width: 90%; max-width: 700px; position: relative; }
+        .btn-inicio { padding: 20px 40px; font-size: 1.8rem; background: #ff4d79; border: none; border-radius: 50px; color: white; cursor: pointer; box-shadow: 0 0 20px #ff4d79; font-family: 'Dancing Script', cursive; }
+        .btn-loco { padding: 15px 25px; font-size: 1.2rem; background: #ff85a2; border: none; border-radius: 50px; color: white; cursor: pointer; position: absolute; transition: 0.15s; }
+        .texto-nostalgico { font-family: 'Dancing Script', cursive; font-size: 2.2rem; color: #ffb7c5; line-height: 1.4; opacity: 0; transition: 1.5s; }
+        .cartas-container { display: flex; gap: 15px; justify-content: center; margin-top: 30px; }
+        .carta { background: #fff; color: #ff4d79; padding: 20px; border-radius: 15px; font-weight: bold; transform: scale(0); transition: 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 10px 20px rgba(0,0,0,0.3); font-family: 'Dancing Script', cursive; font-size: 1.5rem; }
+        .visible { transform: scale(1) !important; opacity: 1 !important; }
+        #emoji-corriendo { font-size: 4rem; position: absolute; bottom: 10%; left: -100px; }
+    </style>
+</head>
+<body>
+
+    <div id="escena">
+        <button id="btnPlay" class="btn-inicio">Prende el volumen y toca aquí ❤️</button>
+    </div>
+    <div id="emoji-corriendo">🏃‍♂️💨</div>
+
+    <script>
+        const escena = document.getElementById('escena');
+        const body = document.body;
+        const emoji = document.getElementById('emoji-corriendo');
+        let clics = 0;
+
+        // --- SISTEMA DE AUDIO (Sin voces de robot) ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function sonar(freq, tipo, duracion, vol = 0.1) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = tipo;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duracion);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duracion);
+        }
+
+        function musicaPiano() {
+            const notas = [261, 329, 392, 523]; // Acorde suave
+            notas.forEach((f, i) => setTimeout(() => sonar(f, 'sine', 2, 0.05), i * 500));
+        }
+
+        // --- FLUJO DE LA WEB ---
+        document.getElementById('btnPlay').addEventListener('click', function() {
+            this.style.display = 'none';
+            iniciarBromas();
+        });
+
+        function iniciarBromas() {
+            const b = document.createElement('button');
+            b.className = 'btn-loco';
+            b.innerText = 'Toca aquí';
+            escena.appendChild(b);
+
+            b.addEventListener('click', () => {
+                clics++;
+                sonar(440 + (clics * 50), 'triangle', 0.2); // Sonido de clic
+                if (clics < 8) {
+                    b.style.top = Math.random() * 70 + "vh";
+                    b.style.left = Math.random() * 70 + "vw";
+                } else {
+                    b.remove();
+                    faseSusto();
+                }
+            });
+        }
+
+        function faseSusto() {
+            body.style.backgroundColor = "red";
+            sonar(100, 'sawtooth', 1, 0.3); // Sonido de error/susto
+            escena.innerHTML = "<h1 style='font-size:4rem'>¡VOLVISTE A CAER! 😂</h1>";
+            setTimeout(faseNostalgia, 3000);
+        }
+
+        function faseNostalgia() {
+            body.style.transition = "3s";
+            body.style.backgroundColor = "#1a0a1a";
+            escena.innerHTML = `<div id='txt' class='texto-nostalgico'>
+                Han pasado 4 años desde ese primer hola... de nuestros dos esclavos solo nos quedamos con la tuya 😂💧<br><br>
+                Creo que debí esperar el 14 pero me da ladilla. Pero bueh, has sido muchas cosas en mi vida y lo aprecio mucho... <br>
+                Eres demasiado rara, linda a veces, pero siempre has estado ahí...
+            </div>`;
+            
+            setTimeout(() => {
+                document.getElementById('txt').style.opacity = 1;
+                setInterval(musicaPiano, 3000); // Inicia ambiente suave
+            }, 500);
+
+            setTimeout(faseFinal, 12000);
+        }
+
+        function faseFinal() {
+            escena.innerHTML = `
+                <h2 class='texto-nostalgico' style='opacity:1'>Quien diria que me haz venido soportando 1,460 dias enfermita... te quelo.</h2>
+                <div class='cartas-container'>
+                    <div class='carta' id='c1'>ERES</div>
+                    <div class='carta' id='c2'>LA MEJOR</div>
+                    <div class='carta' id='c3'>ENFERMITA</div>
+                </div>`;
+            
+            setTimeout(() => { document.getElementById('c1').classList.add('visible'); sonar(523, 'sine', 1); }, 1000);
+            setTimeout(() => { document.getElementById('c2').classList.add('visible'); sonar(659, 'sine', 1); }, 2000);
+            setTimeout(() => { document.getElementById('c3').classList.add('visible'); sonar(783, 'sine', 1); }, 3000);
+
+            setTimeout(remateArhanza, 7000);
+        }
+
+        function remateArhanza() {
+            body.style.backgroundColor = "#000";
+            escena.innerHTML = "<h1 class='texto-nostalgico' style='opacity:1'>¿Será que esto le guste a Arhanza? 😍</h1>";
+            
+            setTimeout(() => {
+                emoji.style.transition = "all 2s linear";
+                emoji.style.left = "120vw";
+                setTimeout(() => {
+                    sonar(150, 'square', 0.5); // Sonido de caída
+                    escena.innerHTML += "<h3 style='color:gray'>*Se cae y come migajas* 🤡</h3>";
+                }, 1200);
+            }, 1000);
+        }
+    </script>
+</body>
